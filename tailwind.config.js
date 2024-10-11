@@ -12,7 +12,6 @@ module.exports = {
         primary: '#00695c',
         secondary: '#004d40',
         accent: '#a5d6a7',
-        darkText: '#1F2937',
       },
     },
   },
