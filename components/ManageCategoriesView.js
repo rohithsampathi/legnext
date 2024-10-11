@@ -47,7 +47,6 @@ const ManageCategoriesView = () => {
         <h1 className="text-2xl font-bold">Manage Categories</h1>
         <Button onClick={() => router.push('/dashboard')} className="flex items-center">
           <Home size={20} className="mr-2" />
-          Home
         </Button>
       </div>
       <Card className="w-full max-w-md mx-auto">

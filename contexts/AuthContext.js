@@ -1,69 +1,46 @@
 // contexts/AuthContext.js
 
-// contexts/AuthContext.js
-
 import React, { createContext, useState, useEffect } from 'react';
-import jwtDecode from 'jwt-decode';
-import { authenticateUser } from '../utils/data';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Initialize loading to true
+  const [user, setUser] = useState(null); // User object or null
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('token');
-        if (token) {
-          try {
-            const decodedToken = jwtDecode(token);
-            if (decodedToken.exp * 1000 > Date.now()) {
-              // You need to fetch user data based on the token
-              const userData = {
-                _id: decodedToken.userId,
-                username: decodedToken.username,
-                isAdmin: decodedToken.isAdmin,
-              };
-              setUser(userData);
-            } else {
-              localStorage.removeItem('token');
-            }
-          } catch (error) {
-            console.error('Error decoding token:', error);
-            localStorage.removeItem('token');
-          }
+    // Simulate fetching user data from localStorage or an API
+    const fetchUser = async () => {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        if (storedUser) {
+          setUser(storedUser);
         }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false); // Set loading to false after authentication check
     };
 
-    initializeAuth();
+    fetchUser();
   }, []);
 
   const login = async (username, password) => {
-    try {
-      const { token, user } = await authenticateUser(username, password);
-      localStorage.setItem('token', token);
-      setUser(user);
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
+    // Implement your login logic here
+    const loggedInUser = { username, isAdmin: false }; // Adjust as needed
+    setUser(loggedInUser);
+    localStorage.setItem('user', JSON.stringify(loggedInUser));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('token');
-  };
-
-  const updateUser = (updatedUserData) => {
-    setUser((prevUser) => ({ ...prevUser, ...updatedUserData }));
+    localStorage.removeItem('user');
+    // Do not perform router redirection here
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

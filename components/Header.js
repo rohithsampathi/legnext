@@ -2,10 +2,10 @@
 
 import React, { useContext } from 'react';
 import { useRouter } from 'next/router';
-import { FaBuilding, FaSignOutAlt } from 'react-icons/fa';
+import { FaBuilding, FaSignOutAlt, FaBars } from 'react-icons/fa';
 import { AuthContext } from '../contexts/AuthContext';
 
-const Header = () => {
+const Header = ({ toggleSidebar }) => {
   const router = useRouter();
   const { logout } = useContext(AuthContext);
 
@@ -15,20 +15,31 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.replace('/login'); // Redirect to login after logout
   };
 
   return (
     <header className="bg-primary text-white p-4 shadow-md">
       <div className="container mx-auto flex items-center justify-between">
-        <button
-          onClick={handleHomeClick}
-          className="flex items-center space-x-2 focus:outline-none"
-        >
-          {/* Community building icon */}
-          <FaBuilding className="h-8 w-8" />
-          <span className="text-2xl font-semibold">CommUnity Hub</span>
-        </button>
+        <div className="flex items-center">
+          {/* Hamburger menu for mobile */}
+          {toggleSidebar && (
+            <button
+              onClick={toggleSidebar}
+              className="mr-4 md:hidden focus:outline-none"
+            >
+              <FaBars className="h-6 w-6" />
+            </button>
+          )}
+          <button
+            onClick={handleHomeClick}
+            className="flex items-center space-x-2 focus:outline-none"
+          >
+            {/* Community building icon */}
+            <FaBuilding className="h-8 w-8" />
+            <span className="text-2xl font-semibold">CommUnity Hub</span>
+          </button>
+        </div>
         {/* Logout Button */}
         <button
           onClick={handleLogout}

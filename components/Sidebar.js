@@ -2,28 +2,39 @@
 
 import React, { useContext } from 'react';
 import { useRouter } from 'next/router';
-import { Home, FileText, Users, Grid } from 'lucide-react';
+import { Home, FileText, Users, Grid, X } from 'lucide-react';
 import { AuthContext } from '../contexts/AuthContext';
 
-const Sidebar = ({ activeView, setActiveView }) => {
+const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { user } = useContext(AuthContext);
   const router = useRouter();
 
   const handleNavigation = (view) => {
-    setActiveView(view);
-    if (view === 'manage-users' || view === 'manage-categories') {
-      router.push(`/${view}`);
+    if (toggleSidebar) {
+      toggleSidebar(); // Close the sidebar on navigation
     }
+    router.push(`/${view}`);
   };
 
   return (
-    <nav className="bg-gray-800 text-white w-64 min-h-screen px-4 py-6 hidden md:block">
+    <div
+      className={`fixed inset-y-0 left-0 bg-gray-800 text-white w-64 px-4 py-6 transform ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      } transition-transform duration-200 ease-in-out md:relative md:translate-x-0 md:min-h-screen`}
+    >
+      {/* Close button for mobile */}
+      <div className="flex items-center justify-between mb-6 md:hidden">
+        <h2 className="text-xl font-semibold">Menu</h2>
+        <button onClick={toggleSidebar} className="focus:outline-none">
+          <X className="h-6 w-6" />
+        </button>
+      </div>
       <ul className="space-y-2">
         <li>
           <button
-            onClick={() => setActiveView('dashboard')}
+            onClick={() => handleNavigation('dashboard')}
             className={`flex items-center space-x-2 p-2 rounded hover:bg-gray-700 w-full text-left ${
-              activeView === 'dashboard' ? 'bg-gray-700' : ''
+              router.pathname === '/dashboard' ? 'bg-gray-700' : ''
             }`}
           >
             <Home size={20} />
@@ -32,22 +43,22 @@ const Sidebar = ({ activeView, setActiveView }) => {
         </li>
         <li>
           <button
-            onClick={() => setActiveView('issues')}
+            onClick={() => handleNavigation('add-issues')}
             className={`flex items-center space-x-2 p-2 rounded hover:bg-gray-700 w-full text-left ${
-              activeView === 'issues' ? 'bg-gray-700' : ''
+              router.pathname === '/add-issues' ? 'bg-gray-700' : ''
             }`}
           >
             <FileText size={20} />
             <span>Issues</span>
           </button>
         </li>
-        {user.isAdmin && (
+        {user && user.isAdmin && (
           <>
             <li>
               <button
                 onClick={() => handleNavigation('manage-users')}
                 className={`flex items-center space-x-2 p-2 rounded hover:bg-gray-700 w-full text-left ${
-                  activeView === 'manage-users' ? 'bg-gray-700' : ''
+                  router.pathname === '/manage-users' ? 'bg-gray-700' : ''
                 }`}
               >
                 <Users size={20} />
@@ -58,7 +69,7 @@ const Sidebar = ({ activeView, setActiveView }) => {
               <button
                 onClick={() => handleNavigation('manage-categories')}
                 className={`flex items-center space-x-2 p-2 rounded hover:bg-gray-700 w-full text-left ${
-                  activeView === 'manage-categories' ? 'bg-gray-700' : ''
+                  router.pathname === '/manage-categories' ? 'bg-gray-700' : ''
                 }`}
               >
                 <Grid size={20} />
@@ -68,7 +79,7 @@ const Sidebar = ({ activeView, setActiveView }) => {
           </>
         )}
       </ul>
-    </nav>
+    </div>
   );
 };
 

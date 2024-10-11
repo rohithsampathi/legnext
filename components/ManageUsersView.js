@@ -57,7 +57,7 @@ const ManageUsersView = () => {
         <h1 className="text-2xl font-bold">Manage Users</h1>
         <Button onClick={() => router.push('/dashboard')} className="flex items-center">
           <Home size={20} className="mr-2" />
-          Home
+          CommUnityHub
         </Button>
       </div>
       <Card className="w-full max-w-md mx-auto mt-10">

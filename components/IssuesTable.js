@@ -110,6 +110,34 @@ const IssuesTable = ({ issues, refreshIssues }) => {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
+        {/* Filters */}
+        <div className="p-4 bg-gray-50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+            <Select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="w-full sm:w-1/3 mb-4 sm:mb-0"
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </Select>
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full sm:w-1/3 mb-4 sm:mb-0"
+            >
+              <option value="">All Statuses</option>
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="On Hold">On Hold</option>
+              <option value="Closed">Closed</option>
+            </Select>
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-gray-50">
@@ -120,6 +148,13 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                   className="w-1/3 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Subject
+                </th>
+                {/* Actions */}
+                <th
+                  scope="col"
+                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
                 </th>
                 {/* Upvotes */}
                 <th
@@ -158,51 +193,12 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                 >
                   Status
                 </th>
-                {/* Actions */}
-                <th
-                  scope="col"
-                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Actions
-                </th>
-              </tr>
-              {/* Filters */}
-              <tr>
-                <th className="px-4 py-2">
-                  <Select
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="w-full"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </Select>
-                </th>
-                <th className="px-4 py-2"></th>
-                <th className="px-4 py-2"></th>
-                <th className="px-4 py-2">
-                  <Select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full"
-                  >
-                    <option value="">All Statuses</option>
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="On Hold">On Hold</option>
-                    <option value="Closed">Closed</option>
-                  </Select>
-                </th>
-                <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredIssues.map((issue) => (
                 <tr key={issue._id} className="hover:bg-gray-50">
+                  {/* Subject */}
                   <td className="px-4 py-4 whitespace-normal">
                     <div className="text-sm font-medium text-gray-900">
                       <button
@@ -216,12 +212,39 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                       Created by {issue.createdBy} in {issue.category}
                     </div>
                   </td>
+                  {/* Actions */}
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className="flex flex-col space-y-2">
+                      {!user.isAdmin &&
+                        issue.status !== 'Closed' &&
+                        !issue.upvotedBy.includes(user.username) && (
+                          <Button
+                            onClick={() => handleUpvote(issue._id)}
+                            className="bg-primary text-white hover:bg-secondary text-xs"
+                          >
+                            Upvote
+                          </Button>
+                        )}
+                      {(user.isAdmin || user.username === issue.createdBy) &&
+                        issue.status !== 'Closed' && (
+                          <Button
+                            onClick={() => handleCloseIssue(issue._id)}
+                            className="bg-red-500 text-white hover:bg-red-600 text-xs"
+                          >
+                            Close
+                          </Button>
+                        )}
+                    </div>
+                  </td>
+                  {/* Upvotes */}
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     {issue.upvotes}
                   </td>
+                  {/* Age */}
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     {calculateIssueAge(issue.createdOn)}
                   </td>
+                  {/* Status */}
                   <td className="px-4 py-4 whitespace-nowrap">
                     {user.isAdmin ? (
                       <Select
@@ -249,29 +272,6 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                         {issue.status}
                       </span>
                     )}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex flex-col space-y-2">
-                      {!user.isAdmin &&
-                        issue.status !== 'Closed' &&
-                        !issue.upvotedBy.includes(user.username) && (
-                          <Button
-                            onClick={() => handleUpvote(issue._id)}
-                            className="bg-primary text-white hover:bg-secondary text-xs"
-                          >
-                            Upvote
-                          </Button>
-                        )}
-                      {(user.isAdmin || user.username === issue.createdBy) &&
-                        issue.status !== 'Closed' && (
-                          <Button
-                            onClick={() => handleCloseIssue(issue._id)}
-                            className="bg-red-500 text-white hover:bg-red-600 text-xs"
-                          >
-                            Close
-                          </Button>
-                        )}
-                    </div>
                   </td>
                 </tr>
               ))}
