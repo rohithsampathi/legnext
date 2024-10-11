@@ -23,6 +23,7 @@ const AddIssueView = () => {
     const fetchCategories = async () => {
       try {
         const categoriesData = await getCategories();
+        console.log('Fetched Categories:', categoriesData); // For debugging
         setCategories(categoriesData);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -96,8 +97,8 @@ const AddIssueView = () => {
                     Select Category
                   </option>
                   {categories.map((cat) => (
-                    <option key={cat._id} value={cat.name}>
-                      {cat.name}
+                    <option key={cat} value={cat}>
+                      {cat}
                     </option>
                   ))}
                 </Select>

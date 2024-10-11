@@ -9,6 +9,7 @@ import Modal from './Modal';
 import { upvoteIssue, closeIssue, changeIssueStatus } from '../utils/data';
 import { exportToCSV } from '../utils/helpers';
 import { AuthContext } from '../contexts/AuthContext';
+import { ThumbsUp, XCircle } from 'lucide-react'; // Imported icons
 
 const IssuesTable = ({ issues, refreshIssues }) => {
   const { user } = useContext(AuthContext);
@@ -36,8 +37,10 @@ const IssuesTable = ({ issues, refreshIssues }) => {
     }
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        const aValue = sortConfig.key === 'ageDays' ? calculateIssueAge(a.createdOn) : a[sortConfig.key];
-        const bValue = sortConfig.key === 'ageDays' ? calculateIssueAge(b.createdOn) : b[sortConfig.key];
+        const aValue =
+          sortConfig.key === 'ageDays' ? calculateIssueAge(a.createdOn) : a[sortConfig.key];
+        const bValue =
+          sortConfig.key === 'ageDays' ? calculateIssueAge(b.createdOn) : b[sortConfig.key];
         if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
         return 0;
@@ -95,6 +98,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
+        {/* Filters */}
         <div className="p-4 bg-gray-50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
             <Select
@@ -104,7 +108,9 @@ const IssuesTable = ({ issues, refreshIssues }) => {
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
               ))}
             </Select>
             <Select
@@ -121,36 +127,77 @@ const IssuesTable = ({ issues, refreshIssues }) => {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* Subject */}
+                <th
+                  scope="col"
+                  className="w-1/4 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Subject
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* Actions */}
+                <th
+                  scope="col"
+                  className="w-1/12 px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+                {/* Category */}
+                <th
+                  scope="col"
+                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Category
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* Created By */}
+                <th
+                  scope="col"
+                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Created By
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Upvotes
+                {/* Upvotes */}
+                <th
+                  scope="col"
+                  className="w-1/12 px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort('upvotes')}
+                >
+                  <div className="flex items-center justify-center">
+                    Upvotes
+                    {sortConfig.key === 'upvotes' && (
+                      <span className="ml-1">{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                    )}
+                  </div>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Age (days)
+                {/* Age */}
+                <th
+                  scope="col"
+                  className="w-1/12 px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort('ageDays')}
+                >
+                  <div className="flex items-center justify-center">
+                    Age
+                    {sortConfig.key === 'ageDays' && (
+                      <span className="ml-1">{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                    )}
+                  </div>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* Status */}
+                <th
+                  scope="col"
+                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredIssues.map((issue) => (
-                <tr key={issue._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <tr key={issue._id} className="hover:bg-gray-50">
+                  {/* Subject */}
+                  <td className="px-4 py-4 whitespace-normal">
                     <div className="text-sm font-medium text-gray-900">
                       <button
                         onClick={() => openIssueModal(issue)}
@@ -160,24 +207,59 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                       </button>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* Actions */}
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-center">
+                    <div className="flex items-center justify-center space-x-2">
+                      {/* Upvote Icon */}
+                      {!user.isAdmin &&
+                        issue.status !== 'Closed' &&
+                        !issue.upvotedBy.includes(user.username) && (
+                          <button
+                            onClick={() => handleUpvote(issue._id)}
+                            className="text-green-500 hover:text-green-700"
+                            title="Upvote"
+                          >
+                            <ThumbsUp size={20} />
+                          </button>
+                        )}
+                      {/* Close Icon */}
+                      {(user.isAdmin || user.username === issue.createdBy) &&
+                        issue.status !== 'Closed' && (
+                          <button
+                            onClick={() => handleCloseIssue(issue._id)}
+                            className="text-red-500 hover:text-red-700"
+                            title="Close Issue"
+                          >
+                            <XCircle size={20} />
+                          </button>
+                        )}
+                    </div>
+                  </td>
+                  {/* Category */}
+                  <td className="px-4 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">{issue.category}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* Created By */}
+                  <td className="px-4 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">{issue.createdBy}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* Upvotes */}
+                  <td className="px-4 py-4 whitespace-nowrap text-center">
                     <div className="text-sm text-gray-500">{issue.upvotes}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{calculateIssueAge(issue.createdOn)}</div>
+                  {/* Age */}
+                  <td className="px-4 py-4 whitespace-nowrap text-center">
+                    <div className="text-sm text-gray-500">
+                      {calculateIssueAge(issue.createdOn)}
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* Status */}
+                  <td className="px-4 py-4 whitespace-nowrap">
                     {user.isAdmin ? (
                       <Select
                         value={issue.status}
                         onChange={(e) => handleStatusChange(issue._id, e.target.value)}
-                        className="text-sm"
+                        className="w-full text-sm"
                       >
                         <option value="Open">Open</option>
                         <option value="In Progress">In Progress</option>
@@ -185,32 +267,19 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                         <option value="Closed">Closed</option>
                       </Select>
                     ) : (
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        issue.status === 'Open' ? 'bg-green-100 text-green-800' :
-                        issue.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                        issue.status === 'On Hold' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          issue.status === 'Open'
+                            ? 'bg-green-100 text-green-800'
+                            : issue.status === 'In Progress'
+                            ? 'bg-blue-100 text-blue-800'
+                            : issue.status === 'On Hold'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
                         {issue.status}
                       </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {!user.isAdmin && issue.status !== 'Closed' && !issue.upvotedBy.includes(user.username) && (
-                      <Button
-                        onClick={() => handleUpvote(issue._id)}
-                        className="bg-primary text-white hover:bg-secondary text-xs mr-2"
-                      >
-                        Upvote
-                      </Button>
-                    )}
-                    {(user.isAdmin || user.username === issue.createdBy) && issue.status !== 'Closed' && (
-                      <Button
-                        onClick={() => handleCloseIssue(issue._id)}
-                        className="bg-red-500 text-white hover:bg-red-600 text-xs"
-                      >
-                        Close
-                      </Button>
                     )}
                   </td>
                 </tr>
@@ -219,16 +288,10 @@ const IssuesTable = ({ issues, refreshIssues }) => {
           </table>
         </div>
       </CardContent>
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title="Issue Details"
-      >
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Issue Details">
         {selectedIssue && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">
-              {selectedIssue.subject}
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-800">{selectedIssue.subject}</h3>
             <p className="text-gray-600">{selectedIssue.description}</p>
             <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
               <span>Created by: {selectedIssue.createdBy}</span>
