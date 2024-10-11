@@ -10,7 +10,18 @@ const handleResponse = async (response) => {
   return response.json();
 };
 
-export const getIssues = () => fetch(`${API_URL}/issues`).then(handleResponse);
+export const getIssues = () =>
+  fetch(`${API_URL}/issues`)
+    .then(handleResponse)
+    .then((data) =>
+      data.map((issue) => ({
+        ...issue,
+        upvotes: issue.upvotes || 0,
+        upvotedBy: issue.upvotedBy || [],
+        createdOn: issue.createdOn || new Date().toISOString(),
+      }))
+    );
+
 
 export const addIssue = (issueData) =>
   fetch(`${API_URL}/issues`, {
@@ -37,13 +48,16 @@ export const closeIssue = (issueId) =>
   updateIssue(issueId, { status: 'Closed' });
 
 export const changeIssueStatus = (issueId, status) =>
-  updateIssue(issueId, { status });
-
-export const getIssueCountsByStatus = () =>
-  fetch(`${API_URL}/issues/counts`).then(handleResponse);
+  fetch(`${API_URL}/issues/${issueId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  }).then(handleResponse);
 
 export const getCategories = () =>
-  fetch(`${API_URL}/categories`).then(handleResponse);
+  fetch(`${API_URL}/categories`)
+    .then(handleResponse)
+    .then(data => data.map(category => category.name || 'Unknown'));
 
 export const addCategory = (categoryName) =>
   fetch(`${API_URL}/categories`, {
@@ -59,7 +73,13 @@ export const deleteCategory = (categoryName) =>
     body: JSON.stringify({ name: categoryName }),
   }).then(handleResponse);
 
-export const getUsers = () => fetch(`${API_URL}/users`).then(handleResponse);
+export const getUsers = () =>
+  fetch(`${API_URL}/users`)
+    .then(handleResponse)
+    .then(data => data.map(user => ({
+      ...user,
+      isAdmin: user.isAdmin || false
+    })));
 
 export const addUser = (userData) =>
   fetch(`${API_URL}/users`, {
@@ -83,7 +103,17 @@ export const authenticateUser = (username, password) =>
   }).then(handleResponse);
 
 export const getCategoryCounts = () =>
-  fetch(`${API_URL}/categories/counts`).then(handleResponse);
+  fetch(`${API_URL}/categories/counts`)
+    .then(handleResponse)
+    .then(data => data.map(item => ({
+      name: item.name || 'Unknown',
+      value: item.value || 0
+    })));
 
 export const getIssueCounts = () =>
-  fetch(`${API_URL}/issues/counts`).then(handleResponse);
+  fetch(`${API_URL}/issues/counts`)
+    .then(handleResponse)
+    .then(data => data.map(item => ({
+      name: item.name || 'Unknown',
+      value: item.value || 0
+    })));

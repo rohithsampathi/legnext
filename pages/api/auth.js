@@ -26,8 +26,9 @@ export default async function handler(req, res) {
       {
         userId: user._id,
         username: user.username,
+        isAdmin: user.isAdmin,
         flatNumber: user.flatNumber,
-        isAdmin: user.isAdmin
+        // Include other necessary fields
       },
       JWT_SECRET,
       { expiresIn: '1h' }
@@ -41,6 +42,7 @@ export default async function handler(req, res) {
         username: user.username,
         flatNumber: user.flatNumber,
         isAdmin: user.isAdmin,
+        // Exclude password from being sent
       },
     });
   } catch (error) {

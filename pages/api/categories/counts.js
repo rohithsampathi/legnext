@@ -9,7 +9,8 @@ export default async function handler(req, res) {
       await dbConnect();
       const categoryCounts = await Issue.aggregate([
         { $group: { _id: '$category', count: { $sum: 1 } } },
-        { $project: { name: '$_id', value: '$count', _id: 0 } },
+        { $project: { name: { $ifNull: ['$_id', 'Unknown'] }, value: '$count', _id: 0 } },
+        { $sort: { name: 1 } },
       ]);
       res.status(200).json(categoryCounts);
     } catch (error) {

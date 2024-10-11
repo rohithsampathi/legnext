@@ -1,46 +1,66 @@
 // contexts/AuthContext.js
 
 import React, { createContext, useState, useEffect } from 'react';
+import jwtDecode from 'jwt-decode';
+import { authenticateUser } from '../utils/data';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // User object or null
-  const [loading, setLoading] = useState(true); // Loading state
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching user data from localStorage or an API
-    const fetchUser = async () => {
-      try {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
-        if (storedUser) {
-          setUser(storedUser);
+    const initializeAuth = async () => {
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('token');
+        if (token) {
+          try {
+            const decodedToken = jwtDecode(token);
+            if (decodedToken.exp * 1000 > Date.now()) {
+              setUser({
+                username: decodedToken.username,
+                isAdmin: decodedToken.isAdmin,
+                flatNumber: decodedToken.flatNumber,
+                // Add other necessary user information
+              });
+            } else {
+              localStorage.removeItem('token');
+            }
+          } catch (error) {
+            console.error('Error decoding token:', error);
+            localStorage.removeItem('token');
+          }
         }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
 
-    fetchUser();
+    initializeAuth();
   }, []);
 
   const login = async (username, password) => {
-    // Implement your login logic here
-    const loggedInUser = { username, isAdmin: false }; // Adjust as needed
-    setUser(loggedInUser);
-    localStorage.setItem('user', JSON.stringify(loggedInUser));
+    try {
+      const { token, user: userData } = await authenticateUser(username, password);
+      localStorage.setItem('token', token);
+      setUser(userData);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    // Do not perform router redirection here
+    localStorage.removeItem('token');
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,14 +4,11 @@ import React, { useContext } from 'react';
 import { useRouter } from 'next/router';
 import { FaBuilding, FaSignOutAlt, FaBars } from 'react-icons/fa';
 import { AuthContext } from '../contexts/AuthContext';
+import Link from 'next/link';
 
 const Header = ({ toggleSidebar }) => {
   const router = useRouter();
   const { logout } = useContext(AuthContext);
-
-  const handleHomeClick = () => {
-    router.push('/dashboard');
-  };
 
   const handleLogout = () => {
     logout();
@@ -23,22 +20,16 @@ const Header = ({ toggleSidebar }) => {
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center">
           {/* Hamburger menu for mobile */}
-          {toggleSidebar && (
-            <button
-              onClick={toggleSidebar}
-              className="mr-4 md:hidden focus:outline-none"
-            >
-              <FaBars className="h-6 w-6" />
-            </button>
-          )}
           <button
-            onClick={handleHomeClick}
-            className="flex items-center space-x-2 focus:outline-none"
+            onClick={toggleSidebar}
+            className="mr-4 md:hidden focus:outline-none"
           >
-            {/* Community building icon */}
+            <FaBars className="h-6 w-6" />
+          </button>
+          <Link href="/dashboard" className="flex items-center space-x-2 focus:outline-none">
             <FaBuilding className="h-8 w-8" />
             <span className="text-2xl font-semibold">CommUnity Hub</span>
-          </button>
+          </Link>
         </div>
         {/* Logout Button */}
         <button

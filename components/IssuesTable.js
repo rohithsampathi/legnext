@@ -28,36 +28,21 @@ const IssuesTable = ({ issues, refreshIssues }) => {
 
   const filteredIssues = useMemo(() => {
     let filtered = [...issues];
-
     if (categoryFilter) {
       filtered = filtered.filter((issue) => issue.category === categoryFilter);
     }
-
     if (statusFilter) {
       filtered = filtered.filter((issue) => issue.status === statusFilter);
     }
-
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        const aValue =
-          sortConfig.key === 'ageDays'
-            ? calculateIssueAge(a.createdOn)
-            : a[sortConfig.key];
-        const bValue =
-          sortConfig.key === 'ageDays'
-            ? calculateIssueAge(b.createdOn)
-            : b[sortConfig.key];
-
-        if (aValue < bValue) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
+        const aValue = sortConfig.key === 'ageDays' ? calculateIssueAge(a.createdOn) : a[sortConfig.key];
+        const bValue = sortConfig.key === 'ageDays' ? calculateIssueAge(b.createdOn) : b[sortConfig.key];
+        if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
         return 0;
       });
     }
-
     return filtered;
   }, [issues, sortConfig, categoryFilter, statusFilter]);
 
@@ -110,7 +95,6 @@ const IssuesTable = ({ issues, refreshIssues }) => {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
-        {/* Filters */}
         <div className="p-4 bg-gray-50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
             <Select
@@ -120,9 +104,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
+                <option key={cat} value={cat}>{cat}</option>
               ))}
             </Select>
             <Select
@@ -139,67 +121,36 @@ const IssuesTable = ({ issues, refreshIssues }) => {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {/* Subject */}
-                <th
-                  scope="col"
-                  className="w-1/3 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Subject
                 </th>
-                {/* Actions */}
-                <th
-                  scope="col"
-                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Actions
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Category
                 </th>
-                {/* Upvotes */}
-                <th
-                  scope="col"
-                  className="w-1/12 px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort('upvotes')}
-                >
-                  <div className="flex items-center justify-center">
-                    Upvotes
-                    {sortConfig.key === 'upvotes' && (
-                      <span className="ml-1">
-                        {sortConfig.direction === 'ascending' ? '▲' : '▼'}
-                      </span>
-                    )}
-                  </div>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Created By
                 </th>
-                {/* Age */}
-                <th
-                  scope="col"
-                  className="w-1/12 px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort('ageDays')}
-                >
-                  <div className="flex items-center justify-center">
-                    Age
-                    {sortConfig.key === 'ageDays' && (
-                      <span className="ml-1">
-                        {sortConfig.direction === 'ascending' ? '▲' : '▼'}
-                      </span>
-                    )}
-                  </div>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Upvotes
                 </th>
-                {/* Status */}
-                <th
-                  scope="col"
-                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Age (days)
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredIssues.map((issue) => (
-                <tr key={issue._id} className="hover:bg-gray-50">
-                  {/* Subject */}
-                  <td className="px-4 py-4 whitespace-normal">
+                <tr key={issue._id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
                       <button
                         onClick={() => openIssueModal(issue)}
@@ -208,49 +159,25 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                         {issue.subject}
                       </button>
                     </div>
-                    <div className="text-sm text-gray-500">
-                      Created by {issue.createdBy} in {issue.category}
-                    </div>
                   </td>
-                  {/* Actions */}
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex flex-col space-y-2">
-                      {!user.isAdmin &&
-                        issue.status !== 'Closed' &&
-                        !issue.upvotedBy.includes(user.username) && (
-                          <Button
-                            onClick={() => handleUpvote(issue._id)}
-                            className="bg-primary text-white hover:bg-secondary text-xs"
-                          >
-                            Upvote
-                          </Button>
-                        )}
-                      {(user.isAdmin || user.username === issue.createdBy) &&
-                        issue.status !== 'Closed' && (
-                          <Button
-                            onClick={() => handleCloseIssue(issue._id)}
-                            className="bg-red-500 text-white hover:bg-red-600 text-xs"
-                          >
-                            Close
-                          </Button>
-                        )}
-                    </div>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{issue.category}</div>
                   </td>
-                  {/* Upvotes */}
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                    {issue.upvotes}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{issue.createdBy}</div>
                   </td>
-                  {/* Age */}
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                    {calculateIssueAge(issue.createdOn)}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{issue.upvotes}</div>
                   </td>
-                  {/* Status */}
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{calculateIssueAge(issue.createdOn)}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     {user.isAdmin ? (
                       <Select
                         value={issue.status}
                         onChange={(e) => handleStatusChange(issue._id, e.target.value)}
-                        className="w-full text-sm"
+                        className="text-sm"
                       >
                         <option value="Open">Open</option>
                         <option value="In Progress">In Progress</option>
@@ -258,19 +185,32 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                         <option value="Closed">Closed</option>
                       </Select>
                     ) : (
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          issue.status === 'Open'
-                            ? 'bg-green-100 text-green-800'
-                            : issue.status === 'In Progress'
-                            ? 'bg-blue-100 text-blue-800'
-                            : issue.status === 'On Hold'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        issue.status === 'Open' ? 'bg-green-100 text-green-800' :
+                        issue.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                        issue.status === 'On Hold' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
                         {issue.status}
                       </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    {!user.isAdmin && issue.status !== 'Closed' && !issue.upvotedBy.includes(user.username) && (
+                      <Button
+                        onClick={() => handleUpvote(issue._id)}
+                        className="bg-primary text-white hover:bg-secondary text-xs mr-2"
+                      >
+                        Upvote
+                      </Button>
+                    )}
+                    {(user.isAdmin || user.username === issue.createdBy) && issue.status !== 'Closed' && (
+                      <Button
+                        onClick={() => handleCloseIssue(issue._id)}
+                        className="bg-red-500 text-white hover:bg-red-600 text-xs"
+                      >
+                        Close
+                      </Button>
                     )}
                   </td>
                 </tr>
