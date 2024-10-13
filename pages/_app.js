@@ -1,13 +1,15 @@
 // pages/_app.js
 
-import React from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
+import { SidebarProvider } from '../contexts/SidebarContext';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (
     <AuthProvider>
-      <Component {...pageProps} />
+      <SidebarProvider>
+        <Component {...pageProps} />
+      </SidebarProvider>
     </AuthProvider>
   );
 }

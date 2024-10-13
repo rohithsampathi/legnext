@@ -1,13 +1,18 @@
 // components/Sidebar.js
 
-import React from 'react';
+import React, { useContext } from 'react';
 import Link from 'next/link';
 import { Home, FileText, Users, Grid } from 'lucide-react';
+import { AuthContext } from '../contexts/AuthContext';
+import { useSidebar } from '../contexts/SidebarContext';
 
-const Sidebar = ({ isOpen, toggleSidebar, activeView, setActiveView, isAdmin }) => {
+const Sidebar = ({ activeView, setActiveView }) => {
+  const { user } = useContext(AuthContext);
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
+
   return (
-    <nav className={`bg-gray-800 text-white w-64 min-h-screen px-4 py-6 ${isOpen ? 'block' : 'hidden'} md:block`}>
-      <div className="flex justify-between items-center mb-6 md:hidden">
+    <nav className={`bg-gray-800 text-white w-64 min-h-screen px-4 py-6 ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
+      <div className="flex justify-between items-center mb-6 lg:hidden">
         <span className="text-xl font-semibold">Menu</span>
         <button onClick={toggleSidebar} className="text-white focus:outline-none">
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -38,7 +43,7 @@ const Sidebar = ({ isOpen, toggleSidebar, activeView, setActiveView, isAdmin }) 
             <span>Issues</span>
           </button>
         </li>
-        {isAdmin && (
+        {user && user.isAdmin && (
           <>
             <li>
               <Link href="/manage-users" className="flex items-center space-x-2 p-2 rounded hover:bg-gray-700">

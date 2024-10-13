@@ -4,11 +4,13 @@ import React, { useContext } from 'react';
 import { useRouter } from 'next/router';
 import { FaBuilding, FaSignOutAlt, FaBars } from 'react-icons/fa';
 import { AuthContext } from '../contexts/AuthContext';
+import { useSidebar } from '../contexts/SidebarContext';
 import Link from 'next/link';
 
-const Header = ({ toggleSidebar }) => {
+const Header = () => {
   const router = useRouter();
   const { logout } = useContext(AuthContext);
+  const { toggleSidebar } = useSidebar();
 
   const handleLogout = () => {
     logout();

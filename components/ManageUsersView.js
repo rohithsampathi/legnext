@@ -60,13 +60,13 @@ const ManageUsersView = () => {
     }
   };
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = async (username) => {
     setError('');
     setSuccess('');
 
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await deleteUser(userId);
+        await deleteUser(username);
         setSuccess('User deleted successfully');
         await fetchUsers(); // Refresh the user list after deletion
       } catch (error) {
@@ -99,7 +99,41 @@ const ManageUsersView = () => {
             <Card className="mb-6">
               <CardContent>
                 <form onSubmit={handleAddUser} className="space-y-4">
-                  {/* ... (rest of the form remains the same) ... */}
+                  <Input
+                    name="username"
+                    placeholder="Username"
+                    value={newUser.username}
+                    onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                  />
+                  <Input
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  />
+                  <Input
+                    name="flatNumber"
+                    placeholder="Flat Number"
+                    value={newUser.flatNumber}
+                    onChange={(e) => setNewUser({ ...newUser, flatNumber: e.target.value })}
+                  />
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="isAdmin"
+                      checked={newUser.isAdmin}
+                      onChange={(e) => setNewUser({ ...newUser, isAdmin: e.target.checked })}
+                      id="isAdmin"
+                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    />
+                    <label htmlFor="isAdmin" className="ml-2 block text-sm text-gray-900">
+                      Is Admin
+                    </label>
+                  </div>
+                  <Button type="submit" className="w-full md:w-auto">
+                    Add User
+                  </Button>
                 </form>
               </CardContent>
             </Card>
@@ -146,7 +180,7 @@ const ManageUsersView = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <Button
-                              onClick={() => handleDeleteUser(u._id)}
+                              onClick={() => handleDeleteUser(u.username)}
                               className="bg-red-500 hover:bg-red-600 text-white text-xs"
                             >
                               Delete

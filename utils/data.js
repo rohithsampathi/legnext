@@ -22,7 +22,6 @@ export const getIssues = () =>
       }))
     );
 
-
 export const addIssue = (issueData) =>
   fetch(`${API_URL}/issues`, {
     method: 'POST',
@@ -42,12 +41,6 @@ export const upvoteIssue = (issueId, username) =>
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username }),
-  }).then(handleResponse);
-
-export const deleteIssue = (issueId) =>
-  fetch(`${API_URL}/issues/${issueId}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
   }).then(handleResponse);
 
 export const closeIssue = (issueId) =>
@@ -94,16 +87,16 @@ export const addUser = (userData) =>
     body: JSON.stringify(userData),
   }).then(handleResponse);
 
-export const deleteUser = (userId) =>
-  fetch(`${API_URL}/users/${userId}`, {
-    method: 'DELETE',
-  }).then(handleResponse);
-
 export const updateUserPassword = (username, newPassword) =>
   fetch(`${API_URL}/users/${encodeURIComponent(username)}/password`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ newPassword }),
+  }).then(handleResponse);
+
+export const deleteUser = (username) =>
+  fetch(`${API_URL}/users/${encodeURIComponent(username)}`, {
+    method: 'DELETE',
   }).then(handleResponse);
 
 export const authenticateUser = (username, password) =>

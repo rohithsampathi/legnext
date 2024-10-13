@@ -256,7 +256,9 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                     )}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{issue.createdBy} ({issue.flatNumber})</div>
+                    <div className="text-sm text-gray-500">
+                      {issue.createdBy} ({issue.createdByFlatNumber})
+                    </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-center">
                     <div className="text-sm text-gray-500">{issue.upvotes}</div>
