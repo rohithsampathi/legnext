@@ -1,5 +1,3 @@
-// contexts/AuthContext.js
-
 import React, { createContext, useState, useEffect } from 'react';
 import jwtDecode from 'jwt-decode';
 import { authenticateUser } from '../utils/data';

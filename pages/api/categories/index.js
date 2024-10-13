@@ -1,5 +1,3 @@
-// pages/api/categories/index.js
-
 import dbConnect from '../../../lib/dbConnect';
 import Category from '../../../models/Category';
 

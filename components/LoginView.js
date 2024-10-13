@@ -1,5 +1,3 @@
-// components/LoginView.js
-
 import React, { useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import { AuthContext } from '../contexts/AuthContext';
@@ -41,10 +39,7 @@ const LoginView = () => {
       </Head>
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md mx-4">
         <div className="text-center">
-          {/* Replace the image with the community icon */}
-          <FaBuilding
-            className="text-darkText w-20 h-20 mx-auto mb-4"
-          />
+          <FaBuilding className="text-darkText w-20 h-20 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             Welcome to CommUnity Hub
           </h2>

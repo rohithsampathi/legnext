@@ -37,14 +37,13 @@ export const updateIssue = (issueId, updateData) =>
   }).then(handleResponse);
 
 export const upvoteIssue = (issueId, username) =>
-  fetch(`${API_URL}/issues/${issueId}/upvote`, {
+  fetch(`${API_URL}/issues/upvote/${issueId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username }),
   }).then(handleResponse);
 
-export const closeIssue = (issueId) =>
-  updateIssue(issueId, { status: 'Closed' });
+export const closeIssue = (issueId) => updateIssue(issueId, { status: 'Closed' });
 
 export const changeIssueStatus = (issueId, status) =>
   fetch(`${API_URL}/issues/${issueId}`, {
@@ -53,10 +52,18 @@ export const changeIssueStatus = (issueId, status) =>
     body: JSON.stringify({ status }),
   }).then(handleResponse);
 
+export const deleteIssue = (issueId) =>
+  fetch(`${API_URL}/issues/${encodeURIComponent(issueId)}`, {
+    method: 'DELETE',
+  }).then(handleResponse);
+
+// ... (Other utility functions remain unchanged)
+
+
 export const getCategories = () =>
   fetch(`${API_URL}/categories`)
     .then(handleResponse)
-    .then(data => data.map(category => category.name || 'Unknown'));
+    .then((data) => data.map((category) => category.name || 'Unknown'));
 
 export const addCategory = (categoryName) =>
   fetch(`${API_URL}/categories`, {
@@ -75,10 +82,12 @@ export const deleteCategory = (categoryName) =>
 export const getUsers = () =>
   fetch(`${API_URL}/users`)
     .then(handleResponse)
-    .then(data => data.map(user => ({
-      ...user,
-      isAdmin: user.isAdmin || false
-    })));
+    .then((data) =>
+      data.map((user) => ({
+        ...user,
+        isAdmin: user.isAdmin || false,
+      }))
+    );
 
 export const addUser = (userData) =>
   fetch(`${API_URL}/users`, {
@@ -97,6 +106,7 @@ export const updateUserPassword = (username, newPassword) =>
 export const deleteUser = (username) =>
   fetch(`${API_URL}/users/${encodeURIComponent(username)}`, {
     method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
   }).then(handleResponse);
 
 export const authenticateUser = (username, password) =>
@@ -109,15 +119,20 @@ export const authenticateUser = (username, password) =>
 export const getCategoryCounts = () =>
   fetch(`${API_URL}/categories/counts`)
     .then(handleResponse)
-    .then(data => data.map(item => ({
-      name: item.name || 'Unknown',
-      value: item.value || 0
-    })));
+    .then((data) =>
+      data.map((item) => ({
+        name: item.name || 'Unknown',
+        value: item.value || 0,
+      }))
+    );
 
 export const getIssueCounts = () =>
   fetch(`${API_URL}/issues/counts`)
     .then(handleResponse)
-    .then(data => data.map(item => ({
-      name: item.name || 'Unknown',
-      value: item.value || 0
-    })));
+    .then((data) =>
+      data.map((item) => ({
+        name: item.name || 'Unknown',
+        value: item.value || 0,
+      }))
+    );
+

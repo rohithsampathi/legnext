@@ -1,4 +1,5 @@
 // components/withAuth.js
+
 import { useRouter } from 'next/router';
 import { useEffect, useContext, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
@@ -28,3 +29,4 @@ const withAuth = (WrappedComponent) => {
 };
 
 export default withAuth;
+

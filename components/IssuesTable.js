@@ -18,6 +18,8 @@ const IssuesTable = ({ issues, refreshIssues }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleSort = (key) => {
     let direction = 'ascending';
@@ -55,27 +57,51 @@ const IssuesTable = ({ issues, refreshIssues }) => {
   }, [issues]);
 
   const handleUpvote = async (issueId) => {
-    await upvoteIssue(issueId, user.username);
-    refreshIssues();
+    try {
+      await upvoteIssue(issueId, user.username);
+      setSuccess('Upvoted successfully!');
+      refreshIssues();
+    } catch (error) {
+      console.error('Failed to upvote issue:', error);
+      setError(error.message);
+    }
   };
 
   const handleCloseIssue = async (issueId) => {
     if (window.confirm('Are you sure you want to close this issue?')) {
-      await closeIssue(issueId);
-      refreshIssues();
+      try {
+        await closeIssue(issueId);
+        setSuccess('Issue closed successfully!');
+        refreshIssues();
+      } catch (error) {
+        console.error('Failed to close issue:', error);
+        setError(error.message);
+      }
     }
   };
 
   const handleDeleteIssue = async (issueId) => {
     if (window.confirm('Are you sure you want to delete this issue?')) {
-      await deleteIssue(issueId);
-      refreshIssues();
+      try {
+        await deleteIssue(issueId);
+        setSuccess('Issue deleted successfully!');
+        refreshIssues();
+      } catch (error) {
+        console.error('Failed to delete issue:', error);
+        setError(error.message);
+      }
     }
   };
 
   const handleStatusChange = async (issueId, status) => {
-    await changeIssueStatus(issueId, status);
-    refreshIssues();
+    try {
+      await changeIssueStatus(issueId, status);
+      setSuccess('Issue status updated successfully!');
+      refreshIssues();
+    } catch (error) {
+      console.error('Failed to change issue status:', error);
+      setError(error.message);
+    }
   };
 
   const openIssueModal = (issue) => {
@@ -105,6 +131,10 @@ const IssuesTable = ({ issues, refreshIssues }) => {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
+        {/* Success and Error Messages */}
+        {success && <p className="text-green-500 mb-4 px-4">{success}</p>}
+        {error && <p className="text-red-500 mb-4 px-4">{error}</p>}
+
         <div className="p-4 bg-gray-50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
             <Select
@@ -136,19 +166,34 @@ const IssuesTable = ({ issues, refreshIssues }) => {
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="w-1/4 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="w-1/4 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Subject
                 </th>
-                <th scope="col" className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Category
                 </th>
-                <th scope="col" className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Actions
                 </th>
-                <th scope="col" className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Status
                 </th>
-                <th scope="col" className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Created By
                 </th>
                 <th
@@ -159,7 +204,9 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                   <div className="flex items-center justify-center">
                     Upvotes
                     {sortConfig.key === 'upvotes' && (
-                      <span className="ml-1">{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                      <span className="ml-1">
+                        {sortConfig.direction === 'ascending' ? '▲' : '▼'}
+                      </span>
                     )}
                   </div>
                 </th>
@@ -171,7 +218,9 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                   <div className="flex items-center justify-center">
                     Age
                     {sortConfig.key === 'ageDays' && (
-                      <span className="ml-1">{sortConfig.direction === 'ascending' ? '▲' : '▼'}</span>
+                      <span className="ml-1">
+                        {sortConfig.direction === 'ascending' ? '▲' : '▼'}
+                      </span>
                     )}
                   </div>
                 </th>
@@ -195,6 +244,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-center">
                     <div className="flex items-center justify-center space-x-2">
+                      {/* Upvote Button */}
                       {!user.isAdmin &&
                         issue.status !== 'Closed' &&
                         !issue.upvotedBy.includes(user.username) && (
@@ -206,6 +256,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                             <ThumbsUp size={20} />
                           </button>
                         )}
+                      {/* Close Issue Button */}
                       {(user.isAdmin || user.username === issue.createdBy) &&
                         issue.status !== 'Closed' && (
                           <button
@@ -216,6 +267,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                             <XCircle size={20} />
                           </button>
                         )}
+                      {/* Delete Issue Button (Admin Only) */}
                       {user.isAdmin && (
                         <button
                           onClick={() => handleDeleteIssue(issue._id)}
@@ -257,7 +309,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500">
-                      {issue.createdBy} ({issue.createdByFlatNumber})
+                      {issue.createdBy} ({issue.flatNumber})
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-center">
@@ -280,7 +332,9 @@ const IssuesTable = ({ issues, refreshIssues }) => {
             <h3 className="text-lg font-semibold text-gray-800">{selectedIssue.subject}</h3>
             <p className="text-gray-600">{selectedIssue.description}</p>
             <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
-              <span>Created by: {selectedIssue.createdBy} ({selectedIssue.flatNumber})</span>
+              <span>
+                Created by: {selectedIssue.createdBy} ({selectedIssue.flatNumber})
+              </span>
               <span>Created on: {formatDateTimeIST(selectedIssue.createdOn)}</span>
               <span>Category: {selectedIssue.category}</span>
               <span>Status: {selectedIssue.status}</span>
