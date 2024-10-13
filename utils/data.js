@@ -57,8 +57,6 @@ export const deleteIssue = (issueId) =>
     method: 'DELETE',
   }).then(handleResponse);
 
-// ... (Other utility functions remain unchanged)
-
 
 export const getCategories = () =>
   fetch(`${API_URL}/categories`)
