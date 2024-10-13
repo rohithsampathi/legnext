@@ -10,6 +10,7 @@ import { upvoteIssue, closeIssue, changeIssueStatus, deleteIssue } from '../util
 import { exportToCSV } from '../utils/helpers';
 import { AuthContext } from '../contexts/AuthContext';
 import { ThumbsUp, XCircle, Trash } from 'lucide-react';
+import { sanitizeIssueId } from '../utils/helpers';
 
 const IssuesTable = ({ issues, refreshIssues }) => {
   const { user } = useContext(AuthContext);
@@ -58,7 +59,8 @@ const IssuesTable = ({ issues, refreshIssues }) => {
 
   const handleUpvote = async (issueId) => {
     try {
-      await upvoteIssue(issueId, user.username);
+      const sanitizedIssueId = sanitizeIssueId(issueId);
+      await upvoteIssue(sanitizedIssueId, user.username);
       setSuccess('Upvoted successfully!');
       refreshIssues();
     } catch (error) {
