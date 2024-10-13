@@ -44,6 +44,12 @@ export const upvoteIssue = (issueId, username) =>
     body: JSON.stringify({ username }),
   }).then(handleResponse);
 
+export const deleteIssue = (issueId) =>
+  fetch(`${API_URL}/issues/${issueId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  }).then(handleResponse);
+
 export const closeIssue = (issueId) =>
   updateIssue(issueId, { status: 'Closed' });
 
@@ -86,6 +92,11 @@ export const addUser = (userData) =>
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(userData),
+  }).then(handleResponse);
+
+export const deleteUser = (userId) =>
+  fetch(`${API_URL}/users/${userId}`, {
+    method: 'DELETE',
   }).then(handleResponse);
 
 export const updateUserPassword = (username, newPassword) =>

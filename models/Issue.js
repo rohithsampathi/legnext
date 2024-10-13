@@ -1,4 +1,5 @@
 // models/Issue.js
+
 import mongoose from 'mongoose';
 
 const IssueSchema = new mongoose.Schema({
@@ -6,6 +7,7 @@ const IssueSchema = new mongoose.Schema({
   category: { type: String, required: true },
   description: { type: String, required: true },
   createdBy: { type: String, required: true },
+  flatNumber: { type: String, required: true },
   upvotes: { type: Number, default: 0 },
   upvotedBy: [{ type: String }],
   createdOn: { type: Date, default: Date.now },

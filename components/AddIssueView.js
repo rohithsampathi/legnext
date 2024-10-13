@@ -23,13 +23,11 @@ const AddIssueView = () => {
     const fetchCategories = async () => {
       try {
         const categoriesData = await getCategories();
-        console.log('Fetched Categories:', categoriesData); // For debugging
         setCategories(categoriesData);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
       }
     };
-
     fetchCategories();
   }, []);
 
@@ -42,6 +40,7 @@ const AddIssueView = () => {
           category,
           description,
           createdBy: user.username,
+          flatNumber: user.flatNumber, // Include the flatNumber
         });
         alert('Issue raised successfully');
         router.push('/dashboard');

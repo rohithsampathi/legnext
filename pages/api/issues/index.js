@@ -14,13 +14,14 @@ export default async function handler(req, res) {
       res.status(500).json({ error: 'Failed to fetch issues' });
     }
   } else if (req.method === 'POST') {
-    const { subject, category, description, createdBy } = req.body;
+    const { subject, category, description, createdBy, flatNumber } = req.body;
     try {
       const newIssue = new Issue({
         subject,
         category,
         description,
         createdBy,
+        flatNumber,
         upvotes: 0,
         upvotedBy: [],
         createdOn: new Date(),

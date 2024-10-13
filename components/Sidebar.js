@@ -4,9 +4,17 @@ import React from 'react';
 import Link from 'next/link';
 import { Home, FileText, Users, Grid } from 'lucide-react';
 
-const Sidebar = ({ activeView, setActiveView, isAdmin }) => {
+const Sidebar = ({ isOpen, toggleSidebar, activeView, setActiveView, isAdmin }) => {
   return (
-    <nav className="bg-gray-800 text-white w-64 min-h-screen px-4 py-6 hidden md:block">
+    <nav className={`bg-gray-800 text-white w-64 min-h-screen px-4 py-6 ${isOpen ? 'block' : 'hidden'} md:block`}>
+      <div className="flex justify-between items-center mb-6 md:hidden">
+        <span className="text-xl font-semibold">Menu</span>
+        <button onClick={toggleSidebar} className="text-white focus:outline-none">
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       <ul className="space-y-2">
         <li>
           <button

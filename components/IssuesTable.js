@@ -6,10 +6,10 @@ import { Card, CardHeader, CardContent } from './Card';
 import Button from './Button';
 import Select from './Select';
 import Modal from './Modal';
-import { upvoteIssue, closeIssue, changeIssueStatus } from '../utils/data';
+import { upvoteIssue, closeIssue, changeIssueStatus, deleteIssue } from '../utils/data';
 import { exportToCSV } from '../utils/helpers';
 import { AuthContext } from '../contexts/AuthContext';
-import { ThumbsUp, XCircle } from 'lucide-react'; // Imported icons
+import { ThumbsUp, XCircle, Trash } from 'lucide-react';
 
 const IssuesTable = ({ issues, refreshIssues }) => {
   const { user } = useContext(AuthContext);
@@ -66,6 +66,13 @@ const IssuesTable = ({ issues, refreshIssues }) => {
     }
   };
 
+  const handleDeleteIssue = async (issueId) => {
+    if (window.confirm('Are you sure you want to delete this issue?')) {
+      await deleteIssue(issueId);
+      refreshIssues();
+    }
+  };
+
   const handleStatusChange = async (issueId, status) => {
     await changeIssueStatus(issueId, status);
     refreshIssues();
@@ -80,10 +87,10 @@ const IssuesTable = ({ issues, refreshIssues }) => {
     const data = filteredIssues.map((issue) => ({
       Subject: issue.subject,
       Category: issue.category,
-      CreatedBy: issue.createdBy,
+      Status: issue.status,
+      CreatedBy: `${issue.createdBy} (${issue.flatNumber})`,
       Upvotes: issue.upvotes,
       CreatedOn: formatDateTimeIST(issue.createdOn),
-      Status: issue.status,
       Age: calculateIssueAge(issue.createdOn),
     }));
     exportToCSV(data, 'issues_export.csv');
@@ -98,7 +105,6 @@ const IssuesTable = ({ issues, refreshIssues }) => {
         </Button>
       </CardHeader>
       <CardContent className="p-0">
-        {/* Filters */}
         <div className="p-4 bg-gray-50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
             <Select
@@ -130,35 +136,21 @@ const IssuesTable = ({ issues, refreshIssues }) => {
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-gray-50">
               <tr>
-                {/* Subject */}
-                <th
-                  scope="col"
-                  className="w-1/4 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th scope="col" className="w-1/4 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Subject
                 </th>
-                {/* Actions */}
-                <th
-                  scope="col"
-                  className="w-1/12 px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Actions
-                </th>
-                {/* Category */}
-                <th
-                  scope="col"
-                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th scope="col" className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
                 </th>
-                {/* Created By */}
-                <th
-                  scope="col"
-                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                <th scope="col" className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+                <th scope="col" className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created By
                 </th>
-                {/* Upvotes */}
                 <th
                   scope="col"
                   className="w-1/12 px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
@@ -171,7 +163,6 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                     )}
                   </div>
                 </th>
-                {/* Age */}
                 <th
                   scope="col"
                   className="w-1/12 px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
@@ -184,19 +175,11 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                     )}
                   </div>
                 </th>
-                {/* Status */}
-                <th
-                  scope="col"
-                  className="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Status
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredIssues.map((issue) => (
                 <tr key={issue._id} className="hover:bg-gray-50">
-                  {/* Subject */}
                   <td className="px-4 py-4 whitespace-normal">
                     <div className="text-sm font-medium text-gray-900">
                       <button
@@ -207,10 +190,11 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                       </button>
                     </div>
                   </td>
-                  {/* Actions */}
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{issue.category}</div>
+                  </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-center">
                     <div className="flex items-center justify-center space-x-2">
-                      {/* Upvote Icon */}
                       {!user.isAdmin &&
                         issue.status !== 'Closed' &&
                         !issue.upvotedBy.includes(user.username) && (
@@ -222,7 +206,6 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                             <ThumbsUp size={20} />
                           </button>
                         )}
-                      {/* Close Icon */}
                       {(user.isAdmin || user.username === issue.createdBy) &&
                         issue.status !== 'Closed' && (
                           <button
@@ -233,27 +216,17 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                             <XCircle size={20} />
                           </button>
                         )}
+                      {user.isAdmin && (
+                        <button
+                          onClick={() => handleDeleteIssue(issue._id)}
+                          className="text-red-500 hover:text-red-700"
+                          title="Delete Issue"
+                        >
+                          <Trash size={20} />
+                        </button>
+                      )}
                     </div>
                   </td>
-                  {/* Category */}
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{issue.category}</div>
-                  </td>
-                  {/* Created By */}
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{issue.createdBy}</div>
-                  </td>
-                  {/* Upvotes */}
-                  <td className="px-4 py-4 whitespace-nowrap text-center">
-                    <div className="text-sm text-gray-500">{issue.upvotes}</div>
-                  </td>
-                  {/* Age */}
-                  <td className="px-4 py-4 whitespace-nowrap text-center">
-                    <div className="text-sm text-gray-500">
-                      {calculateIssueAge(issue.createdOn)}
-                    </div>
-                  </td>
-                  {/* Status */}
                   <td className="px-4 py-4 whitespace-nowrap">
                     {user.isAdmin ? (
                       <Select
@@ -282,6 +255,17 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                       </span>
                     )}
                   </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{issue.createdBy} ({issue.flatNumber})</div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-center">
+                    <div className="text-sm text-gray-500">{issue.upvotes}</div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-center">
+                    <div className="text-sm text-gray-500">
+                      {calculateIssueAge(issue.createdOn)}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -294,7 +278,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
             <h3 className="text-lg font-semibold text-gray-800">{selectedIssue.subject}</h3>
             <p className="text-gray-600">{selectedIssue.description}</p>
             <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
-              <span>Created by: {selectedIssue.createdBy}</span>
+              <span>Created by: {selectedIssue.createdBy} ({selectedIssue.flatNumber})</span>
               <span>Created on: {formatDateTimeIST(selectedIssue.createdOn)}</span>
               <span>Category: {selectedIssue.category}</span>
               <span>Status: {selectedIssue.status}</span>

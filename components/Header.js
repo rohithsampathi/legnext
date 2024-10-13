@@ -12,17 +12,16 @@ const Header = ({ toggleSidebar }) => {
 
   const handleLogout = () => {
     logout();
-    router.replace('/login'); // Redirect to login after logout
+    router.replace('/login');
   };
 
   return (
     <header className="bg-primary text-white p-4 shadow-md">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center">
-          {/* Hamburger menu for mobile */}
           <button
             onClick={toggleSidebar}
-            className="mr-4 md:hidden focus:outline-none"
+            className="mr-4 text-white focus:outline-none lg:hidden"
           >
             <FaBars className="h-6 w-6" />
           </button>
@@ -31,7 +30,6 @@ const Header = ({ toggleSidebar }) => {
             <span className="text-2xl font-semibold">CommUnity Hub</span>
           </Link>
         </div>
-        {/* Logout Button */}
         <button
           onClick={handleLogout}
           className="flex items-center space-x-2 focus:outline-none hover:underline"

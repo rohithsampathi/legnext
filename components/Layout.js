@@ -14,21 +14,16 @@ const Layout = ({ children }) => {
   };
 
   return user ? (
-    <div className="flex">
-      {/* Sidebar */}
+    <div className="flex h-screen overflow-hidden">
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Header */}
+      <div className="flex flex-col flex-1 overflow-hidden">
         <Header toggleSidebar={toggleSidebar} />
-
-        {/* Content */}
-        <main className="flex-grow p-4">{children}</main>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+          {children}
+        </main>
       </div>
     </div>
   ) : (
-    // If not authenticated, render children without Sidebar and Header
     <div className="min-h-screen flex flex-col">{children}</div>
   );
 };
