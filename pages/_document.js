@@ -17,7 +17,7 @@ class MyDocument extends Document {
             content="Designed to make LANSUM Eden Gardens a scalable and sustainable community."
           />
           <meta property="og:image" content="/images/og-image.jpg" />
-          <meta property="og:url" content="https://yourdomain.com" />
+          <meta property="og:url" content="https://lansum.vercel.app" />
           <meta name="twitter:card" content="summary_large_image" />
           {/* Include other meta tags as needed */}
         </Head>
