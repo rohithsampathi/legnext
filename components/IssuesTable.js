@@ -218,7 +218,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                   onClick={() => handleSort('ageDays')}
                 >
                   <div className="flex items-center justify-center">
-                    Age
+                    Age (in Days)
                     {sortConfig.key === 'ageDays' && (
                       <span className="ml-1">
                         {sortConfig.direction === 'ascending' ? '▲' : '▼'}
