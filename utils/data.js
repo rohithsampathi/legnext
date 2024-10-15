@@ -3,7 +3,7 @@
 const API_URL = '/api';
 
 // Helper Function to Sanitize Issue IDs
-const sanitizeIssueId = (issueId) => {
+export const sanitizeIssueId = (issueId) => {
   // Remove any characters after the colon, e.g., "670b9f53e2ab076813df59b5:1" becomes "670b9f53e2ab076813df59b5"
   return issueId.split(':')[0];
 };
@@ -11,7 +11,7 @@ const sanitizeIssueId = (issueId) => {
 // Function to Handle API Responses
 const handleResponse = async (response) => {
   const contentType = response.headers.get('content-type');
-  
+
   // Check if response is JSON
   if (contentType && contentType.includes('application/json')) {
     const data = await response.json();
@@ -31,6 +31,8 @@ const handleResponse = async (response) => {
 };
 
 // Exported API Functions
+
+// ---------------------- Issue Related Functions ----------------------
 
 // Get All Issues
 export const getIssues = () =>
@@ -66,7 +68,7 @@ export const updateIssue = (issueId, updateData) => {
 // Upvote an Issue
 export const upvoteIssue = (issueId, username) => {
   const sanitizedIssueId = sanitizeIssueId(issueId);
-  return fetch(`${API_URL}/issues/${sanitizedIssueId}/upvote`, { // Corrected API route
+  return fetch(`${API_URL}/issues/${sanitizedIssueId}/upvote`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username }),
@@ -95,6 +97,30 @@ export const deleteIssue = (issueId) => {
   }).then(handleResponse);
 };
 
+// Get Category Counts for Dashboard
+export const getCategoryCounts = () =>
+  fetch(`${API_URL}/categories/counts`)
+    .then(handleResponse)
+    .then((data) =>
+      data.map((item) => ({
+        name: item.name || 'Unknown',
+        value: item.value || 0,
+      }))
+    );
+
+// Get Issue Counts by Status for Dashboard
+export const getIssueCounts = () =>
+  fetch(`${API_URL}/issues/counts`)
+    .then(handleResponse)
+    .then((data) =>
+      data.map((item) => ({
+        name: item.name || 'Unknown',
+        value: item.value || 0,
+      }))
+    );
+
+// ---------------------- Category Related Functions ----------------------
+
 // Get All Categories
 export const getCategories = () =>
   fetch(`${API_URL}/categories`)
@@ -116,6 +142,8 @@ export const deleteCategory = (categoryName) =>
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: categoryName }),
   }).then(handleResponse);
+
+// ---------------------- User Related Functions ----------------------
 
 // Get All Users
 export const getUsers = () =>
@@ -155,7 +183,9 @@ export const deleteUser = (username) => {
   }).then(handleResponse);
 };
 
-// Authenticate User
+// ---------------------- Authentication Function ----------------------
+
+// Authenticate User (Login)
 export const authenticateUser = (username, password) =>
   fetch(`${API_URL}/auth`, {
     method: 'POST',
@@ -163,24 +193,41 @@ export const authenticateUser = (username, password) =>
     body: JSON.stringify({ username, password }),
   }).then(handleResponse);
 
-// Get Category Counts
-export const getCategoryCounts = () =>
-  fetch(`${API_URL}/categories/counts`)
-    .then(handleResponse)
-    .then((data) =>
-      data.map((item) => ({
-        name: item.name || 'Unknown',
-        value: item.value || 0,
-      }))
-    );
+// ---------------------- Export to CSV ----------------------
 
-// Get Issue Counts
-export const getIssueCounts = () =>
-  fetch(`${API_URL}/issues/counts`)
-    .then(handleResponse)
-    .then((data) =>
-      data.map((item) => ({
-        name: item.name || 'Unknown',
-        value: item.value || 0,
-      }))
-    );
+// Export Data to CSV
+export const exportToCSV = (data, filename) => {
+  if (!data || data.length === 0) {
+    throw new Error('No data available to export');
+  }
+
+  const csvRows = [];
+
+  // Get headers from the first object
+  const headers = Object.keys(data[0]);
+  csvRows.push(headers.join(','));
+
+  // Loop over the rows
+  for (const row of data) {
+    const values = headers.map((header) => {
+      const escaped = ('' + row[header]).replace(/"/g, '\\"');
+      return `"${escaped}"`;
+    });
+    csvRows.push(values.join(','));
+  }
+
+  const csvContent = csvRows.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+
+  if (link.download !== undefined) {
+    // Feature detection
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};

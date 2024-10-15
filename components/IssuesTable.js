@@ -5,8 +5,14 @@ import { formatDateTimeIST, calculateIssueAge } from '../utils/dateUtils';
 import { Card, CardHeader, CardContent } from './Card';
 import Button from './Button';
 import Select from './Select';
+import Input from './Input'; // Import Input component for search
 import Modal from './Modal';
-import { upvoteIssue, closeIssue, changeIssueStatus, deleteIssue } from '../utils/data';
+import {
+  upvoteIssue,
+  closeIssue,
+  changeIssueStatus,
+  deleteIssue,
+} from '../utils/data';
 import { exportToCSV } from '../utils/helpers';
 import { AuthContext } from '../contexts/AuthContext';
 import { ThumbsUp, XCircle, Trash } from 'lucide-react';
@@ -19,6 +25,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // New state for search term
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -38,6 +45,12 @@ const IssuesTable = ({ issues, refreshIssues }) => {
     if (statusFilter) {
       filtered = filtered.filter((issue) => issue.status === statusFilter);
     }
+    if (searchTerm.trim() !== '') {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      filtered = filtered.filter((issue) =>
+        issue.subject.toLowerCase().includes(lowerSearchTerm)
+      );
+    }
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         const aValue =
@@ -50,7 +63,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
       });
     }
     return filtered;
-  }, [issues, sortConfig, categoryFilter, statusFilter]);
+  }, [issues, sortConfig, categoryFilter, statusFilter, searchTerm]);
 
   const categories = useMemo(() => {
     const allCategories = issues.map((issue) => issue.category);
@@ -65,7 +78,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
       refreshIssues();
     } catch (error) {
       console.error('Failed to upvote issue:', error);
-      setError(error.message);
+      setError(error.message || 'Failed to upvote issue.');
     }
   };
 
@@ -77,7 +90,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
         refreshIssues();
       } catch (error) {
         console.error('Failed to close issue:', error);
-        setError(error.message);
+        setError(error.message || 'Failed to close issue.');
       }
     }
   };
@@ -90,7 +103,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
         refreshIssues();
       } catch (error) {
         console.error('Failed to delete issue:', error);
-        setError(error.message);
+        setError(error.message || 'Failed to delete issue.');
       }
     }
   };
@@ -102,7 +115,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
       refreshIssues();
     } catch (error) {
       console.error('Failed to change issue status:', error);
-      setError(error.message);
+      setError(error.message || 'Failed to change issue status.');
     }
   };
 
@@ -128,7 +141,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
     <Card className="max-w-full">
       <CardHeader className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4">
         <h2 className="text-xl font-semibold mb-4 sm:mb-0">Issues</h2>
-        <Button onClick={handleExport} className="w-full sm:w-auto">
+        <Button onClick={handleExport} className="w-full sm:w-auto mb-4 sm:mb-0">
           Export to Excel
         </Button>
       </CardHeader>
@@ -137,12 +150,22 @@ const IssuesTable = ({ issues, refreshIssues }) => {
         {success && <p className="text-green-500 mb-4 px-4">{success}</p>}
         {error && <p className="text-red-500 mb-4 px-4">{error}</p>}
 
+        {/* Search and Filters */}
         <div className="p-4 bg-gray-50">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
+            {/* Search Input */}
+            <Input
+              type="text"
+              placeholder="Search by Subject"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full md:w-1/3"
+            />
+            {/* Category Filter */}
             <Select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full sm:w-1/3 mb-4 sm:mb-0"
+              className="w-full md:w-1/3"
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
@@ -151,10 +174,11 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                 </option>
               ))}
             </Select>
+            {/* Status Filter */}
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full sm:w-1/3 mb-4 sm:mb-0"
+              className="w-full md:w-1/3"
             >
               <option value="">All Statuses</option>
               <option value="Open">Open</option>
@@ -164,6 +188,7 @@ const IssuesTable = ({ issues, refreshIssues }) => {
             </Select>
           </div>
         </div>
+
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 table-fixed">
             <thead className="bg-gray-50">
@@ -324,6 +349,13 @@ const IssuesTable = ({ issues, refreshIssues }) => {
                   </td>
                 </tr>
               ))}
+              {filteredIssues.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                    No issues found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

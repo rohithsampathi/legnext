@@ -16,10 +16,16 @@ const ManageCategoriesView = () => {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
   const [activeView, setActiveView] = useState('manage-categories');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const fetchCategories = async () => {
-    const categoriesData = await getCategories();
-    setCategories(categoriesData);
+    try {
+      const categoriesData = await getCategories();
+      setCategories(categoriesData);
+    } catch (error) {
+      setError('Failed to fetch categories. Please try again.');
+    }
   };
 
   useEffect(() => {
@@ -28,21 +34,33 @@ const ManageCategoriesView = () => {
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
-    if (newCategory) {
-      await addCategory(newCategory);
+    if (newCategory.trim() === '') {
+      setError('Please enter a category name.');
+      return;
+    }
+    try {
+      await addCategory(newCategory.trim());
       await fetchCategories();
-      alert('Category added successfully');
+      setSuccess('Category added successfully');
       setNewCategory('');
-    } else {
-      alert('Please enter a category name');
+      setError('');
+    } catch (error) {
+      setError(error.message || 'Failed to add category. Please try again.');
+      setSuccess('');
     }
   };
 
   const handleDeleteCategory = async (category) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
-      await deleteCategory(category);
-      await fetchCategories();
-      alert('Category deleted successfully');
+      try {
+        await deleteCategory(category);
+        await fetchCategories();
+        setSuccess('Category deleted successfully');
+        setError('');
+      } catch (error) {
+        setError(error.message || 'Failed to delete category. Please try again.');
+        setSuccess('');
+      }
     }
   };
 
@@ -58,6 +76,8 @@ const ManageCategoriesView = () => {
         <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-auto">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-2xl font-bold mb-6">Manage Categories</h1>
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+            {success && <p className="text-green-500 mb-4">{success}</p>}
             <Card className="mb-6">
               <CardContent>
                 <form onSubmit={handleAddCategory} className="flex flex-col md:flex-row md:items-center md:space-x-4">
@@ -108,6 +128,13 @@ const ManageCategoriesView = () => {
                           </td>
                         </tr>
                       ))}
+                      {categories.length === 0 && (
+                        <tr>
+                          <td colSpan="2" className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+                            No categories found.
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
