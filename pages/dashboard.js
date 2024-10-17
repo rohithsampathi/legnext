@@ -5,7 +5,7 @@ import DashboardView from '../components/DashboardView';
 import withAuth from '../components/withAuth';
 
 const DashboardPage = () => {
-  return <DashboardView />;
+  return <DashboardView activeView="dashboard" />;
 };
 
 export default withAuth(DashboardPage);

@@ -15,12 +15,28 @@ export default async function handler(req, res) {
   await dbConnect();
 
   try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
+    const { identifier, password } = req.body;
+
+    if (!identifier || !password) {
+      return res.status(400).json({ success: false, error: 'Missing credentials' });
+    }
+
+    // Find user by username (case-insensitive) or flat number
+    const user = await User.findOne({
+      $or: [
+        { username: new RegExp(`^${identifier}$`, 'i') },
+        { flatNumber: identifier }
+      ]
+    });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
+
+    // Update login statistics
+    user.loginCount += 1;
+    user.lastLogin = new Date();
+    await user.save();
 
     const token = jwt.sign(
       {
@@ -28,7 +44,6 @@ export default async function handler(req, res) {
         username: user.username,
         isAdmin: user.isAdmin,
         flatNumber: user.flatNumber,
-        // Include other necessary fields
       },
       JWT_SECRET,
       { expiresIn: '1h' }
@@ -42,10 +57,10 @@ export default async function handler(req, res) {
         username: user.username,
         flatNumber: user.flatNumber,
         isAdmin: user.isAdmin,
-        // Exclude password from being sent
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Authentication error:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 }

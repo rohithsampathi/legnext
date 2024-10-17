@@ -10,24 +10,11 @@ export const sanitizeIssueId = (issueId) => {
 
 // Function to Handle API Responses
 const handleResponse = async (response) => {
-  const contentType = response.headers.get('content-type');
-
-  // Check if response is JSON
-  if (contentType && contentType.includes('application/json')) {
-    const data = await response.json();
-    if (!response.ok) {
-      // Extract error message from response
-      const errorMsg = data.error || 'An error occurred';
-      throw new Error(errorMsg);
-    }
-    return data;
-  } else {
-    // If response is not JSON, throw a generic error
-    if (!response.ok) {
-      throw new Error('An error occurred');
-    }
-    return null; // or return response.text() if needed
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || 'An error occurred');
   }
+  return data;
 };
 
 // Exported API Functions
@@ -186,11 +173,11 @@ export const deleteUser = (username) => {
 // ---------------------- Authentication Function ----------------------
 
 // Authenticate User (Login)
-export const authenticateUser = (username, password) =>
+export const authenticateUser = (identifier, password) =>
   fetch(`${API_URL}/auth`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ identifier, password }),
   }).then(handleResponse);
 
 // ---------------------- Export to CSV ----------------------
@@ -231,3 +218,22 @@ export const exportToCSV = (data, filename) => {
     document.body.removeChild(link);
   }
 };
+
+// Add this function if it's not already present
+export const getUserAnalytics = () =>
+  fetch(`${API_URL}/users/analytics`)
+    .then(handleResponse)
+    .catch(error => {
+      console.error('Error fetching user analytics:', error);
+      throw error;
+    });
+
+export const updateUserSession = (username, duration) =>
+  fetch(`${API_URL}/users/updateSession`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify({ username, duration }),
+  }).then(handleResponse);

@@ -9,17 +9,17 @@ import { FaBuilding } from 'react-icons/fa'; // Import the community icon
 const LoginView = () => {
   const { login } = useContext(AuthContext);
   const router = useRouter();
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(username, password);
+      await login(identifier, password);
       router.push('/dashboard');
     } catch (err) {
-      setError('Invalid username or password');
+      setError('Invalid username/flat number or password');
     }
   };
 
@@ -49,10 +49,10 @@ const LoginView = () => {
         </div>
         <form onSubmit={handleSubmit}>
           <Input
-            name="username"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="identifier"
+            placeholder="Username or Flat Number"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             className="mb-4"
           />
           <Input

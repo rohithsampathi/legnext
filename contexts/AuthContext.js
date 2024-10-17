@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import jwtDecode from 'jwt-decode';
-import { authenticateUser } from '../utils/data';
+import { authenticateUser, updateUserSession } from '../utils/data';
 
 export const AuthContext = createContext();
 
@@ -37,11 +37,22 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = async (username, password) => {
+  useEffect(() => {
+    if (user) {
+      const interval = setInterval(() => {
+        updateUserSession(user.username, 60); // Update every minute
+      }, 60000);
+
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const login = async (identifier, password) => {
     try {
-      const { token, user: userData } = await authenticateUser(username, password);
+      const { token, user: userData } = await authenticateUser(identifier, password);
       localStorage.setItem('token', token);
       setUser(userData);
+      console.log('User logged in:', userData);
     } catch (error) {
       console.error('Login error:', error);
       throw error;

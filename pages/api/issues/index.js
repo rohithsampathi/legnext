@@ -2,6 +2,7 @@
 
 import dbConnect from '../../../lib/dbConnect';
 import Issue from '../../../models/Issue';
+import User from '../../../models/User';
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -28,6 +29,14 @@ export default async function handler(req, res) {
         status: 'Open',
       });
       await newIssue.save();
+
+      // In the POST method for creating a new issue
+      const user = await User.findOne({ username: createdBy });
+      if (user) {
+        user.issuesRaised += 1;
+        await user.save();
+      }
+
       res.status(201).json(newIssue);
     } catch (error) {
       res.status(500).json({ error: 'Failed to create issue' });
