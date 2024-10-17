@@ -86,7 +86,7 @@ const EdenPulseDashboard = ({ issues }) => {
   };
 
   if (!categoryCounts.length || !issueCounts.length || !monthlyIssueCounts.length) {
-    return <div>Loading dashboard data...</div>;
+    return <div>Loading EdenPulse data...</div>;
   }
 
   return (
